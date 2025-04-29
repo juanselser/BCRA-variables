@@ -102,44 +102,117 @@ df = pd.merge(df_v, df_usd, on="fecha", how="inner")
 if df.empty:
     st.stop("No hay datos para el período seleccionado.")
 
+# Obtener datos del dólar blue
+df_blue = get_usd_blue(fecha_inicio, fecha_fin)
+
+# Unir con tus datos existentes
+if df_blue is not None and not df_blue.empty:
+    df = pd.merge(df, df_blue, on="fecha", how="left")
+
+# # =============================
+# # GRAFICAR
+# # =============================
+# fig = go.Figure()
+
+# fig.add_trace(go.Scatter(
+#     x=df["fecha"],
+#     y=df["valor_variable"],
+#     mode='lines',
+#     name=descripcion_seleccionada,
+#     yaxis="y1"
+# ))
+
+# fig.add_trace(go.Scatter(
+#     x=df["fecha"],
+#     y=df["tipoCotizacion"],
+#     mode='lines',
+#     name="Tipo de Cambio USD",
+#     yaxis="y2"
+# ))
+
+# try:
+#     fig.update_layout(
+#         title=f"{descripcion_seleccionada} vs Tipo de Cambio USD (BCRA)",
+#         xaxis=dict(title="Fecha"),
+#         yaxis=dict(title=descripcion_seleccionada, tickfont=dict(color="blue")),
+#         yaxis2=dict(title="Tipo de Cambio USD",
+#                     tickfont=dict(color="red"), overlaying="y", side="right"),
+#         legend=dict(x=0.01, y=0.99),
+#         height=500,
+#         width=900
+#     )
+# except Exception as e:
+#     st.error(f"Error al actualizar el layout: {e}")
+#     st.stop()
+
+# st.plotly_chart(fig, use_container_width=True)
+
 # =============================
-# GRAFICAR
+# GRAFICAR (CON DÓLAR BLUE)
 # =============================
 fig = go.Figure()
 
+# 1. Variable monetaria seleccionada (eje Y izquierdo)
 fig.add_trace(go.Scatter(
     x=df["fecha"],
     y=df["valor_variable"],
     mode='lines',
     name=descripcion_seleccionada,
-    yaxis="y1"
+    yaxis="y1",
+    line=dict(color='blue')
 ))
 
+# 2. Dólar Oficial (eje Y derecho)
 fig.add_trace(go.Scatter(
     x=df["fecha"],
     y=df["tipoCotizacion"],
     mode='lines',
-    name="Tipo de Cambio USD",
-    yaxis="y2"
+    name="Dólar Oficial",
+    yaxis="y2",
+    line=dict(color='green')
 ))
+
+# 3. Dólar Blue (eje Y derecho)
+if 'usd_blue' in df.columns:  # Verificar si tenemos datos de blue
+    fig.add_trace(go.Scatter(
+        x=df["fecha"],
+        y=df["usd_blue"],
+        mode='lines',
+        name="Dólar Blue",
+        yaxis="y2",
+        line=dict(color='red', dash='dot')
+    ))
 
 try:
     fig.update_layout(
-        title=f"{descripcion_seleccionada} vs Tipo de Cambio USD (BCRA)",
+        title=f"{descripcion_seleccionada} vs Tipos de Cambio USD",
         xaxis=dict(title="Fecha"),
-        yaxis=dict(title=descripcion_seleccionada, tickfont=dict(color="blue")),
-        yaxis2=dict(title="Tipo de Cambio USD",
-                    tickfont=dict(color="red"), overlaying="y", side="right"),
-        legend=dict(x=0.01, y=0.99),
+        yaxis=dict(
+            title=descripcion_seleccionada, 
+            tickfont=dict(color="blue"),
+            side="left"
+        ),
+        yaxis2=dict(
+            title="Tipos de Cambio USD (Oficial y Blue)",
+            tickfont=dict(color="red"), 
+            overlaying="y", 
+            side="right",
+            showgrid=False  # Opcional: mejora la legibilidad
+        ),
+        legend=dict(
+            x=0.01, 
+            y=0.99,
+            bgcolor='rgba(255,255,255,0.5)'  # Fondo semitransparente
+        ),
         height=500,
-        width=900
+        width=900,
+        hovermode="x unified"  # Muestra todos los valores al pasar el mouse
     )
 except Exception as e:
     st.error(f"Error al actualizar el layout: {e}")
     st.stop()
 
 st.plotly_chart(fig, use_container_width=True)
-
 # =============================
 # COTIZACIÓN USD BLUE (Bluelytics)
 # =============================
