@@ -136,30 +136,12 @@ if df_usd_blue is not None and not df_usd_blue.empty:
 else:
     st.warning("No se pudieron obtener datos del dólar blue para el período seleccionado")
 
-# =============================
 # UNIR DATOS
 # =============================
-# 1. Unir variable monetaria con dólar oficial
 df = pd.merge(df_v, df_usd, on="fecha", how="inner")
 if df.empty:
     st.stop("No hay datos para el período seleccionado.")
 
-# 2. Obtener y unir dólar blue
-try:
-    df_blue = get_usd_blue(fecha_inicio, fecha_fin)
-    
-    if df_blue is not None and not df_blue.empty:
-        # Usar outer join para mantener todas las fechas disponibles
-        df = pd.merge(df, df_blue, on="fecha", how="left")
-        
-        # Opcional: Llenar NaN con el último valor conocido (forward fill)
-        df['usd_blue'] = df['usd_blue'].fillna(method='ffill')
-        
-        # Verificar si hay datos de blue después del merge
-        if df['usd_blue'].isnull().all():
-            st.warning("Advertencia: No se encontraron datos de dólar blue para el período seleccionado")
-except Exception as e:
-    st.warning(f"Advertencia: No se pudieron obtener datos del dólar blue. Error: {str(e)}")
 # # =============================
 # # GRAFICAR
 # # =============================
