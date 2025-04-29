@@ -96,6 +96,47 @@ df_usd["fecha"] = pd.to_datetime(df_usd["fecha"])
 df_usd = df_usd.groupby("fecha").mean(numeric_only=True).reset_index()
 
 # =============================
+# COTIZACIÓN USD BLUE (Bluelytics)
+# =============================
+def get_usd_blue(fecha_inicio, fecha_fin):
+    try:
+        url = "https://api.bluelytics.com.ar/v2/evolution.json"
+        r = requests.get(url)
+        
+        if r.status_code != 200:
+            st.warning("Error al obtener datos del dólar blue")
+            return None
+            
+        data = r.json()
+        
+        # Filtrar y procesar datos
+        blue_data = [entry for entry in data if entry["source"] == "Blue"]
+        df = pd.DataFrame(blue_data)
+        
+        # Convertir y filtrar fechas
+        df["fecha"] = pd.to_datetime(df["date"])
+        df = df[(df["fecha"] >= pd.to_datetime(fecha_inicio)) & 
+                (df["fecha"] <= pd.to_datetime(fecha_fin))]
+        
+        # Calcular promedio blue
+        df["tipoCotizacion"] = (df["value_buy"] + df["value_sell"]) / 2
+        
+        return df[["fecha", "tipoCotizacion"]]
+        
+    except Exception as e:
+        st.error(f"Error al obtener dólar blue: {str(e)}")
+        return None
+
+# Uso en tu aplicación:
+df_usd_blue = get_usd_blue(fecha_inicio, fecha_fin)
+
+if df_usd_blue is not None and not df_usd_blue.empty:
+    # Aquí puedes usar df_usd_blue igual que df_usd del oficial
+    st.success("Datos del dólar blue obtenidos correctamente")
+else:
+    st.warning("No se pudieron obtener datos del dólar blue para el período seleccionado")
+
+# =============================
 # UNIR DATOS
 # =============================
 df = pd.merge(df_v, df_usd, on="fecha", how="inner")
@@ -213,43 +254,3 @@ except Exception as e:
     st.stop()
 
 st.plotly_chart(fig, use_container_width=True)
-# =============================
-# COTIZACIÓN USD BLUE (Bluelytics)
-# =============================
-def get_usd_blue(fecha_inicio, fecha_fin):
-    try:
-        url = "https://api.bluelytics.com.ar/v2/evolution.json"
-        r = requests.get(url)
-        
-        if r.status_code != 200:
-            st.warning("Error al obtener datos del dólar blue")
-            return None
-            
-        data = r.json()
-        
-        # Filtrar y procesar datos
-        blue_data = [entry for entry in data if entry["source"] == "Blue"]
-        df = pd.DataFrame(blue_data)
-        
-        # Convertir y filtrar fechas
-        df["fecha"] = pd.to_datetime(df["date"])
-        df = df[(df["fecha"] >= pd.to_datetime(fecha_inicio)) & 
-                (df["fecha"] <= pd.to_datetime(fecha_fin))]
-        
-        # Calcular promedio blue
-        df["tipoCotizacion"] = (df["value_buy"] + df["value_sell"]) / 2
-        
-        return df[["fecha", "tipoCotizacion"]]
-        
-    except Exception as e:
-        st.error(f"Error al obtener dólar blue: {str(e)}")
-        return None
-
-# Uso en tu aplicación:
-df_usd_blue = get_usd_blue(fecha_inicio, fecha_fin)
-
-if df_usd_blue is not None and not df_usd_blue.empty:
-    # Aquí puedes usar df_usd_blue igual que df_usd del oficial
-    st.success("Datos del dólar blue obtenidos correctamente")
-else:
-    st.warning("No se pudieron obtener datos del dólar blue para el período seleccionado")
