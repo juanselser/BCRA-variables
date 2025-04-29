@@ -206,43 +206,43 @@ fig.add_trace(go.Scatter(
 ))
 
 # 3. Dólar Blue (eje Y derecho)
-if 'usd_blue' in df.columns:  # Verificar si tenemos datos de blue
-    fig.add_trace(go.Scatter(
-        x=df["fecha"],
-        y=df["usd_blue"],
-        mode='lines',
-        name="Dólar Blue",
-        yaxis="y2",
-        line=dict(color='red', dash='dot')
-    ))
+ # Verificar si tenemos datos de blue
+fig.add_trace(go.Scatter(
+    x=df["fecha"],
+    y=df["usd_blue"],
+    mode='lines',
+    name="Dólar Blue",
+    yaxis="y2",
+    line=dict(color='red', dash='dot')
+))
 
-try:
-    fig.update_layout(
-        title=f"{descripcion_seleccionada} vs Tipos de Cambio USD",
-        xaxis=dict(title="Fecha"),
-        yaxis=dict(
-            title=descripcion_seleccionada, 
-            tickfont=dict(color="blue"),
-            side="left"
-        ),
-        yaxis2=dict(
-            title="Tipos de Cambio USD (Oficial y Blue)",
-            tickfont=dict(color="red"), 
-            overlaying="y", 
-            side="right",
-            showgrid=False  # Opcional: mejora la legibilidad
-        ),
-        legend=dict(
-            x=0.01, 
-            y=0.99,
-            bgcolor='rgba(255,255,255,0.5)'  # Fondo semitransparente
-        ),
-        height=500,
-        width=900,
-        hovermode="x unified"  # Muestra todos los valores al pasar el mouse
-    )
-except Exception as e:
-    st.error(f"Error al actualizar el layout: {e}")
-    st.stop()
+# try:
+#     fig.update_layout(
+#         title=f"{descripcion_seleccionada} vs Tipos de Cambio USD",
+#         xaxis=dict(title="Fecha"),
+#         yaxis=dict(
+#             title=descripcion_seleccionada, 
+#             tickfont=dict(color="blue"),
+#             side="left"
+#         ),
+#         yaxis2=dict(
+#             title="Tipos de Cambio USD (Oficial y Blue)",
+#             tickfont=dict(color="red"), 
+#             overlaying="y", 
+#             side="right",
+#             showgrid=False  # Opcional: mejora la legibilidad
+#         ),
+#         legend=dict(
+#             x=0.01, 
+#             y=0.99,
+#             bgcolor='rgba(255,255,255,0.5)'  # Fondo semitransparente
+#         ),
+#         height=500,
+#         width=900,
+#         hovermode="x unified"  # Muestra todos los valores al pasar el mouse
+#     )
+# except Exception as e:
+#     st.error(f"Error al actualizar el layout: {e}")
+#     st.stop()
 
 st.plotly_chart(fig, use_container_width=True)
