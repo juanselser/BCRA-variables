@@ -37,17 +37,12 @@ df_info = pd.DataFrame(res_info.json()["results"])
 df_info = df_info[df_info["idVariable"].isin([15, 1])]  # ← Filtro clave
 df_info = df_info.sort_values("descripcion")
 
-if df_info.empty:
-    st.stop("No se encontraron las variables con códigos 15 y 1.")
+# if df_info.empty:
+#     st.stop("No se encontraron las variables con códigos 15 y 1.")
 
-# Selección simplificada para solo dos opciones
-variable_elegida = st.radio(
-    "Seleccioná la variable a comparar con el dólar:",
-    options=df_info["descripcion"].tolist()
-)
-id_variable = df_info[df_info["descripcion"] == variable_elegida].iloc[0]["idVariable"]
-
-# El resto del código permanece igual...
+# Selección de variable desde selectbox
+descripcion_seleccionada = st.selectbox("Seleccioná una variable monetaria", df_info["descripcion"])
+id_variable = df_info[df_info["descripcion"] == descripcion_seleccionada].iloc[0]["idVariable"]
 
 
 # =============================
