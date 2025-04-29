@@ -205,16 +205,16 @@ fig.add_trace(go.Scatter(
     line=dict(color='green')
 ))
 
-# 3. Dólar Blue (eje Y derecho)
- # Verificar si tenemos datos de blue
-fig.add_trace(go.Scatter(
-    x=df["fecha"],
-    y=df["usd_blue"],
-    mode='lines',
-    name="Dólar Blue",
-    yaxis="y2",
-    line=dict(color='red', dash='dot')
-))
+# # 3. Dólar Blue (eje Y derecho)
+#  # Verificar si tenemos datos de blue
+# fig.add_trace(go.Scatter(
+#     x=df["fecha"],
+#     y=df["usd_blue"],
+#     mode='lines',
+#     name="Dólar Blue",
+#     yaxis="y2",
+#     line=dict(color='red', dash='dot')
+# ))
 
 # try:
 #     fig.update_layout(
