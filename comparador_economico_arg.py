@@ -99,11 +99,33 @@ df = pd.merge(df1, df2, on="fecha", how="inner").dropna()
 # ============ GRAFICAR ============
 fig = go.Figure()
 
-fig.add_trace(go.Scatter(x=df["fecha"], y=df[df.columns[1]],
+# Asegurar nombres únicos y comprensibles para las columnas
+col1 = df.columns[1]
+col2 = df.columns[2]
+
+same_axis = var1 == var2 or "usd" in col1 and "usd" in col2
+
+fig.add_trace(go.Scatter(x=df["fecha"], y=df[col1],
                          name=var1, yaxis="y1", mode="lines"))
 
-fig.add_trace(go.Scatter(x=df["fecha"], y=df[df.columns[2]],
-                         name=var2, yaxis="y2", mode="lines"))
+fig.add_trace(go.Scatter(x=df["fecha"], y=df[col2],
+                         name=var2, yaxis="y1" if same_axis else "y2", mode="lines"))
+
+fig.update_layout(
+    title=f"Comparación: {var1} vs {var2}",
+    xaxis=dict(title="Fecha"),
+    yaxis=dict(title=var1 if same_axis else col1, titlefont=dict(color="blue"), tickfont=dict(color="blue")),
+    yaxis2=dict(
+        title=col2,
+        titlefont=dict(color="red"),
+        tickfont=dict(color="red"),
+        overlaying="y",
+        side="right"
+    ) if not same_axis else None,
+    legend=dict(x=0.01, y=0.99),
+    height=600
+)
+
 
 fig.update_layout(
     title=f"Comparación: {var1} vs {var2}",
